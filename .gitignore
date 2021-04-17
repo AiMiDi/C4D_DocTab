@@ -1,0 +1,28 @@
+
+r21 sdk/plugins/project/.vs/
+
+r21 sdk/plugins/project/_obj/
+
+r21 sdk/frameworks/command.framework/generated/
+
+r21 sdk/frameworks/cinema.framework/generated/
+
+r21 sdk/frameworks/core.framework/generated/
+
+r21 sdk/frameworks/crypt.framework/generated/
+
+r21 sdk/frameworks/image.framework/generated/
+
+r21 sdk/frameworks/math.framework/generated/
+
+r21 sdk/frameworks/mesh_misc.framework/generated/
+
+r21 sdk/frameworks/python.framework/generated/
+
+r21 sdk/frameworks/settings/sourceprocessor/
+
+r21 sdk/plugins/DocTab/generated/
+
+*.pdb
+
+*.ilk
