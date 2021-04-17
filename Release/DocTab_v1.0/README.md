@@ -18,7 +18,7 @@ aimidi
 
 ## GitHub
 
-https://github.com/AiMiDi/C4D_MMD_Tool
+https://github.com/AiMiDi/C4D_DocTab
 
 
 
@@ -42,4 +42,4 @@ aimidi
 
 ## GitHub
 
-https://github.com/AiMiDi/C4D_MMD_Tool
+https://github.com/AiMiDi/C4D_DocTab
