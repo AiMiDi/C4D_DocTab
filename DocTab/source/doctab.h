@@ -8,11 +8,10 @@ enum { DOC_TAB = 0, ADD_TAB };
 class DocTabUserArea : public GeUserArea
 {
 	BaseDocument* doc;	
-	Int32 index;
 	Int32 mode;
 	INSTANCEOF(DocTabUserArea, GeUserArea)
 public:	
-	DocTabUserArea(BaseDocument* doc_, Int32 index_, Int32 mode_) : doc(doc_), index(index_), mode(mode_){}
+	DocTabUserArea(BaseDocument* doc_, Int32 mode_) : doc(doc_), mode(mode_){}
 	~DocTabUserArea(){}
 	virtual Bool InputEvent(const BaseContainer& msg);
 	virtual void DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseContainer& msg);
@@ -24,10 +23,10 @@ class DocTabDialog : public GeDialog
 	maxon::PointerArray<DocTabUserArea*> doc_tab_dialog_arr;
 	INSTANCEOF(DocTabDialog, GeDialog)
 public:
-	static Int32 active;
 	DocTabDialog():addDocTab(nullptr){
 	}
 	~DocTabDialog();
+	virtual Bool CoreMessage(Int32 id, const BaseContainer& msg);
 	virtual Bool CreateLayout();
 	Bool RefreshTab();
 	//virtual Bool InitValues();

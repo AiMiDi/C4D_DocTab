@@ -1,6 +1,5 @@
 #include "doctab.h"
 
-Int32 DocTabDialog::active = 0;
 
 DocTabDialog::~DocTabDialog() {
 	for (DocTabUserArea* i : doc_tab_dialog_arr) {
@@ -16,7 +15,7 @@ void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseC
 	OffScreenOn();	
 	if (mode == DOC_TAB) {
 		if (doc != nullptr) {
-			if (DocTabDialog::active == index) {
+			if (doc==GetActiveDocument()) {
 				DrawBitmap(AutoBitmap("active.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 				SetClippingRegion(x2 * 0.12, y1, x2 * 0.65, y2);
 				DrawSetTextCol(Vector(223, 131, 60) / 256, COLOR_TRANS);
@@ -47,7 +46,6 @@ Bool DocTabUserArea::InputEvent(const BaseContainer& msg) {
 			Int32 ClickX = msg.GetInt32(BFM_INPUT_X);
 			Int32 ClickY = msg.GetInt32(BFM_INPUT_Y);
 			Global2Local(&ClickX, &ClickY);
-			DocTabDialog::active = index;
 			SetActiveDocument(doc);
 			if (ClickX >= (Int32)(this->GetWidth() * 0.75) && ClickX <= (Int32)(this->GetWidth() * 0.75 + 16) && ClickY >= (Int32)(this->GetHeight() * 0.6 - 8) && ClickY <= (Int32)(this->GetHeight() * 0.6 + 8)) {
 				//GePrint("x"_s);
@@ -60,8 +58,9 @@ Bool DocTabUserArea::InputEvent(const BaseContainer& msg) {
 			}
 		}
 		else {
-			BaseDocument* newDoc = BaseDocument::Alloc();
-			InsertBaseDocument(newDoc);
+			if (IsCommandEnabled(12094)) {
+				CallCommand(12094);
+			}
 			if (!((DocTabDialog*)dlg)->RefreshTab())return false;
 		}
 	}
@@ -72,25 +71,31 @@ Bool DocTabDialog::CreateLayout() {
 	this->SetTitle("DocTab"_s);
 	BaseDocument* doc = GetFirstDocument();
 	GroupBeginInMenuLine();
-	GroupBegin(1000, BFH_LEFT, 0, 1, ""_s, 0, 0, 0);
+	GroupBegin(1000, BFH_LEFT , 0, 1, ""_s, 0, 0, 0);
 	GroupSpace(0, 0);
 	while (doc != nullptr)
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
-		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, Index, DOC_TAB);
+		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
 		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , 160, 14);
 		if (userAreaGadget != nullptr)
 			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
 		doc = doc->GetNext();
 	}
-	addDocTab = new DocTabUserArea(doc, 2000, ADD_TAB);
+	addDocTab = new DocTabUserArea(doc, ADD_TAB);
 	C4DGadget* const userAreaGadget = this->AddUserArea(2000, BFH_LEFT, 30, 14);
 	if (userAreaGadget != nullptr)
 		this->AttachUserArea((*addDocTab), userAreaGadget);
 	GroupEnd();
 	GroupEnd();
 	return true;
+}
+Bool DocTabDialog::CoreMessage(Int32 id, const BaseContainer& msg) {
+	if (id == EVMSG_DOCUMENTRECALCULATED) {
+		if (!this->RefreshTab())return false;
+	}
+	return SUPER::CoreMessage(id, msg);
 }
 
 Bool DocTabDialog::RefreshTab() {
@@ -105,15 +110,15 @@ Bool DocTabDialog::RefreshTab() {
 	while (doc != nullptr)
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
-		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, Index, DOC_TAB);
+		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
 		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , 160, 14);
 		if (userAreaGadget != nullptr)
 			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
 		doc = doc->GetNext();
 	}
-	addDocTab = new DocTabUserArea(doc, 2000, ADD_TAB);
-	C4DGadget* const userAreaGadget = this->AddUserArea(2000, BFH_LEFT, 30, 14);
+	addDocTab = new DocTabUserArea(doc, ADD_TAB);
+	C4DGadget* const userAreaGadget = this->AddUserArea(2000, BFH_LEFT , 30, 14);
 	if (userAreaGadget != nullptr)
 		this->AttachUserArea((*addDocTab), userAreaGadget);
 	LayoutChanged(1000);
