@@ -1,7 +1,8 @@
 #include "doctab.h"
 
 
-DocTabDialog::~DocTabDialog() {
+DocTabDialog::~DocTabDialog() //释放分配的内存
+{
 	for (DocTabUserArea* i : doc_tab_dialog_arr) {
 		if (i) {
 			delete i;
@@ -10,12 +11,17 @@ DocTabDialog::~DocTabDialog() {
 	if (addDocTab) {
 		delete addDocTab;
 	}
+	if (recDocTab) {
+		delete recDocTab;
+	}
 }
 void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseContainer& msg) {
-	OffScreenOn();	
-	if (mode == DOC_TAB) {
+	OffScreenOn(); //防止屏幕闪烁
+	if (mode == DOC_TAB) //标签
+	{
 		if (doc != nullptr) {
-			if (doc==GetActiveDocument()) {
+			if (doc==GetActiveDocument()) //如果是活动文档则高亮
+			{
 				DrawBitmap(AutoBitmap("active.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 				SetClippingRegion(x2 * 0.12, y1, x2 * 0.65, y2);
 				DrawSetTextCol(Vector(223, 131, 60) / 256, COLOR_TRANS);
@@ -23,7 +29,8 @@ void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseC
 				ClearClippingRegion();
 				DrawBitmap(AutoBitmap("close.png"_s), x2 * 0.75, y2 * 0.6 - 8, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 			}
-			else {
+			else //不是活动文档
+			{
 				DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 				SetClippingRegion(x2 * 0.12, y1, x2 * 0.65, y2);
 				DrawSetTextCol(Vector(165, 165, 165) / 256, COLOR_TRANS);
@@ -33,35 +40,64 @@ void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseC
 			}
 		}
 	}
-	else {
+	else if (mode == ADD_TAB) //添加按钮
+	{
 		DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 		DrawSetTextCol(Vector(165, 165, 165) / 256, COLOR_TRANS);
 		DrawText("+"_s, x2 * 0.3, y2 * 0.65 - 8);	
+	}if (mode == REC_DOC) {
+		DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
+		DrawSetTextCol(Vector(165, 165, 165) / 256, COLOR_TRANS);
+		DrawText("R"_s, x2 * 0.3, y2 * 0.65 - 8);
 	}
 }
 Bool DocTabUserArea::InputEvent(const BaseContainer& msg) {
 	if (msg.GetInt32(BFM_INPUT_DEVICE) == BFM_INPUT_MOUSE && msg.GetInt32(BFM_INPUT_CHANNEL) == BFM_INPUT_MOUSELEFT)
 	{
+		
 		if (mode == DOC_TAB) {
 			Int32 ClickX = msg.GetInt32(BFM_INPUT_X);
 			Int32 ClickY = msg.GetInt32(BFM_INPUT_Y);
-			Global2Local(&ClickX, &ClickY);
-			SetActiveDocument(doc);
+			Global2Local(&ClickX, &ClickY);	
+			SetActiveDocument(doc);	
 			if (ClickX >= (Int32)(this->GetWidth() * 0.75) && ClickX <= (Int32)(this->GetWidth() * 0.75 + 16) && ClickY >= (Int32)(this->GetHeight() * 0.6 - 8) && ClickY <= (Int32)(this->GetHeight() * 0.6 + 8)) {
-				//GePrint("x"_s);
+				//判断点击是在×的位置
 				if (doc != nullptr) {
-					if (IsCommandEnabled(12664)) {
-						CallCommand(12664);
+					if (msg.GetInt32(BFM_INPUT_QUALIFIER) == 1)//QUALIFIER::SHIFT = 1，判断是否同时按shift
+					{
+						KillDocument(doc);
+					}
+					else {
+						if (IsCommandEnabled(12664))//call关闭项目的命令
+						{
+							CallCommand(12664);
+						}
 					}
 					if (!((DocTabDialog*)dlg)->RefreshTab())return false;
 				}
 			}
 		}
-		else {
-			if (IsCommandEnabled(12094)) {
+		else if (mode == ADD_TAB) {
+			if (IsCommandEnabled(12094)) //call打开文档的命令
+			{
 				CallCommand(12094);
 			}
 			if (!((DocTabDialog*)dlg)->RefreshTab())return false;
+		}
+		else  if (mode == REC_DOC) {
+			maxon::BaseArray<maxon::Url> RecDocArr = GetRecentDocumentsList(false).GetValue();
+			BaseContainer bc;
+			Int32 index = 1;//从1开始，防止与0冲突，最后的返回值得-1
+			for (maxon::Url i : RecDocArr) //迭代最近文档，并设置索引
+			{
+				bc.SetString(index, i.GetPath());			
+				index++;
+			}
+			Int32 openDoc = ShowPopupMenu(nullptr, MOUSEPOS, MOUSEPOS, bc);
+			if (openDoc!=0) //返回0就是没有选择
+			{
+				LoadFile(MaxonConvert(RecDocArr[openDoc-1]));
+			}
 		}
 	}
 	return true;
@@ -73,7 +109,7 @@ Bool DocTabDialog::CreateLayout() {
 	GroupBeginInMenuLine();
 	GroupBegin(1000, BFH_LEFT , 0, 1, ""_s, 0, 0, 0);
 	GroupSpace(0, 0);
-	while (doc != nullptr)
+	while (doc != nullptr)//遍历全部的项目，添加到标签
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
 		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
@@ -83,10 +119,14 @@ Bool DocTabDialog::CreateLayout() {
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
 		doc = doc->GetNext();
 	}
-	addDocTab = new DocTabUserArea(doc, ADD_TAB);
-	C4DGadget* const userAreaGadget = this->AddUserArea(2000, BFH_LEFT, 30, 14);
+	addDocTab = new DocTabUserArea(nullptr, ADD_TAB);
+	C4DGadget* userAreaGadget = this->AddUserArea(1001, BFH_LEFT, 30, 14);//添加添加标签的按钮
 	if (userAreaGadget != nullptr)
 		this->AttachUserArea((*addDocTab), userAreaGadget);
+	recDocTab = new DocTabUserArea(nullptr, REC_DOC);
+	userAreaGadget = this->AddUserArea(1002, BFH_LEFT, 30, 14);//添加历史文档的按钮
+	if (userAreaGadget != nullptr)
+		this->AttachUserArea((*recDocTab), userAreaGadget);
 	GroupEnd();
 	GroupEnd();
 	return true;
@@ -99,15 +139,16 @@ Bool DocTabDialog::CoreMessage(Int32 id, const BaseContainer& msg) {
 }
 
 Bool DocTabDialog::RefreshTab() {
-	for (DocTabUserArea* i : doc_tab_dialog_arr) {
+	for (DocTabUserArea* i : doc_tab_dialog_arr) //释放之前的标签
+	{
 		if (i) {
 			delete i;
 		}
 	}
 	doc_tab_dialog_arr.Reset();
 	BaseDocument* doc = GetFirstDocument();
-	LayoutFlushGroup(1000);
-	while (doc != nullptr)
+	LayoutFlushGroup(1000);//刷新组
+	while (doc != nullptr)//遍历全部的项目，添加到标签
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
 		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
@@ -117,10 +158,12 @@ Bool DocTabDialog::RefreshTab() {
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
 		doc = doc->GetNext();
 	}
-	addDocTab = new DocTabUserArea(doc, ADD_TAB);
-	C4DGadget* const userAreaGadget = this->AddUserArea(2000, BFH_LEFT , 30, 14);
+	C4DGadget* userAreaGadget = this->AddUserArea(1001, BFH_LEFT , 30, 14);//添加添加标签的按钮
 	if (userAreaGadget != nullptr)
 		this->AttachUserArea((*addDocTab), userAreaGadget);
+	userAreaGadget = this->AddUserArea(1002, BFH_LEFT, 30, 14);//添加历史文档的按钮
+	if (userAreaGadget != nullptr)
+		this->AttachUserArea((*recDocTab), userAreaGadget);
 	LayoutChanged(1000);
 	return true;
 }

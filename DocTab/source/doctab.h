@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-enum { DOC_TAB = 0, ADD_TAB };
+enum { DOC_TAB = 0, ADD_TAB ,REC_DOC};
 
 class DocTabUserArea : public GeUserArea
 {
@@ -20,6 +20,7 @@ public:
 class DocTabDialog : public GeDialog
 {
 	DocTabUserArea* addDocTab;
+	DocTabUserArea* recDocTab;
 	maxon::PointerArray<DocTabUserArea*> doc_tab_dialog_arr;
 	INSTANCEOF(DocTabDialog, GeDialog)
 public:
