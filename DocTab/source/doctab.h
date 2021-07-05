@@ -38,6 +38,10 @@ class DocTab : public CommandData
 	DocTabDialog doc_tab_dialog;
 	INSTANCEOF(DocTab, CommandData)
 public:
+	virtual Bool RestoreLayout(void* secret) {
+		return doc_tab_dialog.RestoreLayout(ID_DOC_TAB, 0, secret);
+	}
+
 	virtual Bool Execute(BaseDocument* doc, GeDialog* parentManager) {
 		if (doc_tab_dialog.IsOpen() == false)
 			doc_tab_dialog.Open(DLG_TYPE::ASYNC, ID_DOC_TAB,-1,-1,0,30);

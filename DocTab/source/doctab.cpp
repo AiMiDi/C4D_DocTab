@@ -1,5 +1,5 @@
 #include "doctab.h"
-
+#include "c4d_symbols.h"
 
 DocTabDialog::~DocTabDialog() //释放分配的内存
 {
@@ -23,20 +23,20 @@ void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseC
 			if (doc==GetActiveDocument()) //如果是活动文档则高亮
 			{
 				DrawBitmap(AutoBitmap("active.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
-				SetClippingRegion(x2 * 0.12, y1, x2 * 0.65, y2);
+				SetClippingRegion(x1 + 14, y1, x2 * 0.8, y2);
 				DrawSetTextCol(Vector(223, 131, 60) / 256, COLOR_TRANS);
-				DrawText(doc->GetDocumentName().GetFileString(), x2 * 0.12, y2 * 0.65 - 8);
+				DrawText(doc->GetDocumentName().GetFileString(), x1 + 14, y1 + 5);
 				ClearClippingRegion();
-				DrawBitmap(AutoBitmap("close.png"_s), x2 * 0.75, y2 * 0.6 - 8, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
+				DrawBitmap(AutoBitmap("close.png"_s), x2 - 21, y1  + 5, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 			}
 			else //不是活动文档
 			{
 				DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
-				SetClippingRegion(x2 * 0.12, y1, x2 * 0.65, y2);
+				SetClippingRegion(x1 + 14, y1, x2 * 0.8, y2);
 				DrawSetTextCol(Vector(165, 165, 165) / 256, COLOR_TRANS);
-				DrawText(doc->GetDocumentName().GetFileString(), x2 * 0.12, y2 * 0.65 - 8);
+				DrawText(doc->GetDocumentName().GetFileString(), x1 + 14, y1 + 5);
 				ClearClippingRegion();
-				DrawBitmap(AutoBitmap("close_in.png"_s), x2 * 0.75, y2 * 0.6 - 8, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
+				DrawBitmap(AutoBitmap("close_in.png"_s), x2 - 21, y1 + 5, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 			}
 		}
 	}
@@ -60,7 +60,7 @@ Bool DocTabUserArea::InputEvent(const BaseContainer& msg) {
 			Int32 ClickY = msg.GetInt32(BFM_INPUT_Y);
 			Global2Local(&ClickX, &ClickY);	
 			SetActiveDocument(doc);	
-			if (ClickX >= (Int32)(this->GetWidth() * 0.75) && ClickX <= (Int32)(this->GetWidth() * 0.75 + 16) && ClickY >= (Int32)(this->GetHeight() * 0.6 - 8) && ClickY <= (Int32)(this->GetHeight() * 0.6 + 8)) {
+			if (ClickX >= (Int32)(this->GetWidth() - 21) && ClickX <= (Int32)(this->GetWidth() - 8) && ClickY >= 5 && ClickY <= 18) {
 				//判断点击是在×的位置
 				if (doc != nullptr) {
 					if (msg.GetInt32(BFM_INPUT_QUALIFIER) == 1)//QUALIFIER::SHIFT = 1，判断是否同时按shift
@@ -96,7 +96,10 @@ Bool DocTabUserArea::InputEvent(const BaseContainer& msg) {
 			Int32 openDoc = ShowPopupMenu(nullptr, MOUSEPOS, MOUSEPOS, bc);
 			if (openDoc!=0) //返回0就是没有选择
 			{
-				LoadFile(MaxonConvert(RecDocArr[openDoc-1]));
+				if (!LoadFile(MaxonConvert(RecDocArr[openDoc - 1]))) {
+					MessageDialog(GeLoadString(MSG_LOADFILE_FAIL));
+				}
+				if (!((DocTabDialog*)dlg)->RefreshTab())return false;
 			}
 		}
 	}
@@ -113,7 +116,7 @@ Bool DocTabDialog::CreateLayout() {
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
 		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
-		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , 160, 14);
+		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT, 40 + 15 * doc->GetDocumentName().GetFileString().GetLength(), 14);
 		if (userAreaGadget != nullptr)
 			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
@@ -132,7 +135,7 @@ Bool DocTabDialog::CreateLayout() {
 	return true;
 }
 Bool DocTabDialog::CoreMessage(Int32 id, const BaseContainer& msg) {
-	if (id == EVMSG_DOCUMENTRECALCULATED) {
+	if (id == EVMSG_UPDATEBASEDRAW) {
 		if (!this->RefreshTab())return false;
 	}
 	return SUPER::CoreMessage(id, msg);
@@ -152,7 +155,7 @@ Bool DocTabDialog::RefreshTab() {
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
 		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
-		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , 160, 14);
+		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , 40 + 15 * doc->GetDocumentName().GetFileString().GetLength(), 14);
 		if (userAreaGadget != nullptr)
 			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;

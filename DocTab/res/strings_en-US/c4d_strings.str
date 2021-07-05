@@ -1,0 +1,4 @@
+STRINGTABLE
+{
+	MSG_LOADFILE_FAIL "Failed to open the file, please check if the file is deleted.";
+}
