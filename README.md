@@ -18,6 +18,8 @@ The current version can only be right-aligned, and future versions may be update
 
 **v1.3** Fix the problem that the switching interface is not displayed, and the problem that the document name is not displayed completely.
 
+**v1.4** Fix the problem that the interface does not refresh when dragged into the question file, and optimize the adjustment of the label length.
+
 ## Author
 
 aimidi
@@ -47,6 +49,8 @@ C4D R20以上版本用的文档标签插件。
 **v1.2** 添加打开最近文档功能（R20 API不支持，没有更新）。
 
 **v1.3** 修复切换界面不显示的问题，修复文档名称显示不全问题。
+
+**v1.4** 修复拖入问档界面不刷新的问题，优化标签长度调整。
 
 ## 作者
 

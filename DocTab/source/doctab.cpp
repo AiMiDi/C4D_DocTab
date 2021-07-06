@@ -23,18 +23,18 @@ void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseC
 			if (doc==GetActiveDocument()) //如果是活动文档则高亮
 			{
 				DrawBitmap(AutoBitmap("active.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
-				SetClippingRegion(x1 + 14, y1, x2 * 0.8, y2);
+				SetClippingRegion(x1 + 10, y1, x2 * 0.8, y2);
 				DrawSetTextCol(Vector(223, 131, 60) / 256, COLOR_TRANS);
-				DrawText(doc->GetDocumentName().GetFileString(), x1 + 14, y1 + 5);
+				DrawText(doc->GetDocumentName().GetFileString(), x1 + 10, y1 + 5);
 				ClearClippingRegion();
 				DrawBitmap(AutoBitmap("close.png"_s), x2 - 21, y1  + 5, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 			}
 			else //不是活动文档
 			{
 				DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
-				SetClippingRegion(x1 + 14, y1, x2 * 0.8, y2);
+				SetClippingRegion(x1 + 10, y1, x2 * 0.8, y2);
 				DrawSetTextCol(Vector(165, 165, 165) / 256, COLOR_TRANS);
-				DrawText(doc->GetDocumentName().GetFileString(), x1 + 14, y1 + 5);
+				DrawText(doc->GetDocumentName().GetFileString(), x1 + 10, y1 + 5);
 				ClearClippingRegion();
 				DrawBitmap(AutoBitmap("close_in.png"_s), x2 - 21, y1 + 5, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 			}
@@ -116,7 +116,17 @@ Bool DocTabDialog::CreateLayout() {
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
 		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
-		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT, 40 + 15 * doc->GetDocumentName().GetFileString().GetLength(), 14);
+		Int32 TabW = 40;
+		String& DocName = doc->GetDocumentName().GetFileString();
+		for (Char i : DocName) {
+			if (maxon::IsAlphanumeric(i) || maxon::IsSpace(i)) {
+				TabW += 12;
+			}
+			else {
+				TabW += 15;
+			}
+		}
+		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT, TabW, 14);
 		if (userAreaGadget != nullptr)
 			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
@@ -135,7 +145,7 @@ Bool DocTabDialog::CreateLayout() {
 	return true;
 }
 Bool DocTabDialog::CoreMessage(Int32 id, const BaseContainer& msg) {
-	if (id == EVMSG_UPDATEBASEDRAW) {
+	if (id == EVMSG_DOCUMENTRECALCULATED) {
 		if (!this->RefreshTab())return false;
 	}
 	return SUPER::CoreMessage(id, msg);
@@ -155,7 +165,17 @@ Bool DocTabDialog::RefreshTab() {
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
 		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
-		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , 40 + 15 * doc->GetDocumentName().GetFileString().GetLength(), 14);
+		Int32 TabW = 40;
+		String& DocName = doc->GetDocumentName().GetFileString();
+		for (Char i : DocName) {
+			if (maxon::IsAlphanumeric(i) || maxon::IsSpace(i)) {
+				TabW += 12;
+			}
+			else {
+				TabW += 15;
+			}
+		}
+		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , TabW, 14);
 		if (userAreaGadget != nullptr)
 			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
