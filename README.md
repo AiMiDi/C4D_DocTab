@@ -1,24 +1,18 @@
 # C4D_DocTab
 
-![](https://ftp.bmp.ovh/imgs/2021/07/c7d5d34bb53d6c51.png)
+![image-20210417155624932](DocTab.jpg)
 
 ## Introduction
 
-Document tag plugin for C4D R20 and above. (R20-S24)
+Document tag plugin for C4D R20 and above.
 
 The current version can only be right-aligned, and future versions may be updated.
 
-## usage
-
-Click `+` to create a new project, click `R` to open the historical project; 
-
-click the label `×` to close the project, hold down `SHIFT` and click the label `×` to close the project directly.
-
 ## version
 
-**v1.0** Basic functions.
+**v1.0** basic functions.
 
-**v1.1** Fix interface dislocation, optimizes opening documents and checking active documents.
+**v1.1** fixes interface dislocation, optimizes opening documents and checking active documents.
 
 **v1.2** Add the function of opening recent documents(R20 API does not support, no update)
 
@@ -26,19 +20,11 @@ click the label `×` to close the project, hold down `SHIFT` and click the label
 
 **v1.4** Fix the problem that the interface does not refresh when dragged into the question file, and optimize the adjustment of the label length.
 
-**v1.5** Change to left alignment to optimize operation efficiency.
-
 ## Author
 
-AiMiDi
-
-[![](https://img.shields.io/badge/-@AiMiDi-%23181717?style=flat-square&logo=github)](https://github.com/AiMiDi)   
-
-[![](https://img.shields.io/badge/-%40艾米蒂aimidi-blue?style=flat-square&logo=bilibili)](https://space.bilibili.com/30898053)
+aimidi
 
 ## GitHub
-
-It will be updated on GitHub as the C4D version is updated in the future.
 
 https://github.com/AiMiDi/C4D_DocTab
 
@@ -46,17 +32,13 @@ https://github.com/AiMiDi/C4D_DocTab
 
 ------
 
-![](https://ftp.bmp.ovh/imgs/2021/07/1fcf0bc7f3a91567.png)
+![image-20210417155624932](DocTab.jpg)
 
 ## 简介
 
-C4D R20以上版本用的文档标签插件。(R20-S24)
+C4D R20以上版本用的文档标签插件。
 
 目前版本只能右对齐，以后版本可能会更新。
-
-## 使用
-
-点击`+`新建项目，点击`R`打开历史项目；点击标签的`×`关闭项目,按住`SHIFT`点击标签的`×`直接关闭项目。
 
 ## 版本
 
@@ -70,18 +52,10 @@ C4D R20以上版本用的文档标签插件。(R20-S24)
 
 **v1.4** 修复拖入问档界面不刷新的问题，优化标签长度调整。
 
-**v1.5** 更改为左对齐模式，优化运行效率。
-
 ## 作者
 
-AiMiDi
-
-[![](https://img.shields.io/badge/-@AiMiDi-%23181717?style=flat-square&logo=github)](https://github.com/AiMiDi)   
-
-[![](https://img.shields.io/badge/-%40艾米蒂aimidi-blue?style=flat-square&logo=bilibili)](https://space.bilibili.com/30898053)
+aimidi
 
 ## GitHub
-
-后续随着C4D版本更新将在GitHub更新。
 
 https://github.com/AiMiDi/C4D_DocTab

@@ -7,8 +7,8 @@ enum { DOC_TAB = 0, ADD_TAB ,REC_DOC};
 
 class DocTabUserArea : public GeUserArea
 {
-	BaseDocument* doc = nullptr;
-	Int32 mode = 0;
+	BaseDocument* doc;	
+	Int32 mode;
 	INSTANCEOF(DocTabUserArea, GeUserArea)
 public:	
 	DocTabUserArea(BaseDocument* doc_, Int32 mode_) : doc(doc_), mode(mode_){}
@@ -19,12 +19,13 @@ public:
 
 class DocTabDialog : public GeDialog
 {
-	DocTabUserArea* addDocTab = nullptr;
-	DocTabUserArea* recDocTab = nullptr;
+	DocTabUserArea* addDocTab;
+	DocTabUserArea* recDocTab;
 	maxon::PointerArray<DocTabUserArea*> doc_tab_dialog_arr;
 	INSTANCEOF(DocTabDialog, GeDialog)
 public:
-	DocTabDialog();
+	DocTabDialog():addDocTab(nullptr){
+	}
 	~DocTabDialog();
 	virtual Bool CoreMessage(Int32 id, const BaseContainer& msg);
 	virtual Bool CreateLayout();
