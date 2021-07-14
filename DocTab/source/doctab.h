@@ -50,4 +50,4 @@ public:
 		return true;
 	}
 };
-#endif __DOCTAB_H__
+#endif //__DOCTAB_H__
