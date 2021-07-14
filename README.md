@@ -6,8 +6,6 @@
 
 Document tag plugin for C4D R20 and above. (R20-S24)
 
-The current version can only be right-aligned, and future versions may be updated.
-
 ## usage
 
 Click `+` to create a new project, click `R` to open the historical project; 
@@ -51,8 +49,6 @@ https://github.com/AiMiDi/C4D_DocTab
 ## 简介
 
 C4D R20以上版本用的文档标签插件。(R20-S24)
-
-目前版本只能右对齐，以后版本可能会更新。
 
 ## 使用
 
