@@ -20,7 +20,7 @@ Bool PluginMessage(Int32 id, void *data)
 	case (C4DPL_INIT_SYS):
 	{
 		if (!g_resource.Init()) {
-			return false;	
+			return false;		// 没有资源就不要启动插件
 		}
 		return true;
 		break;

@@ -1,8 +1,14 @@
 #include "doctab.h"
 #include "c4d_symbols.h"
 
-DocTabDialog::~DocTabDialog() //ï¿½Í·Å·ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
+DocTabDialog::DocTabDialog() {
+	//É¾³ý²Ëµ¥À¸ 
+	C4DOS.Cd->AddGadget(Get(), DIALOG_NOMENUBAR, 0, NULL, 0, 0, 0, 0, NULL, NULL);
+}
+
+DocTabDialog::~DocTabDialog()
 {
+	//ÊÍ·Å·ÖÅäµÄÄÚ´æ
 	for (DocTabUserArea* i : doc_tab_dialog_arr) {
 		if (i) {
 			delete i;
@@ -16,20 +22,25 @@ DocTabDialog::~DocTabDialog() //ï¿½Í·Å·ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
 	}
 }
 void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseContainer& msg) {
-	OffScreenOn(); //ï¿½ï¿½Ö¹ï¿½ï¿½Ä»ï¿½ï¿½Ë¸
-	if (mode == DOC_TAB) //ï¿½ï¿½Ç©
+	//·ÀÖ¹ÆÁÄ»ÉÁË¸
+	OffScreenOn();
+	//»æÖÆ±êÇ©
+	switch (mode)
+	{
+	case DOC_TAB:
 	{
 		if (doc != nullptr) {
-			if (doc==GetActiveDocument()) //ï¿½ï¿½ï¿½ï¿½Ç»î¶¯ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			//Èç¹ûÊÇ»î¶¯ÎÄµµÔò¸ßÁÁ
+			if (doc == GetActiveDocument())
 			{
 				DrawBitmap(AutoBitmap("active.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 				SetClippingRegion(x1 + 10, y1, x2 * 0.8, y2);
 				DrawSetTextCol(Vector(223, 131, 60) / 256, COLOR_TRANS);
 				DrawText(doc->GetDocumentName().GetFileString(), x1 + 10, y1 + 5);
 				ClearClippingRegion();
-				DrawBitmap(AutoBitmap("close.png"_s), x2 - 21, y1  + 5, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
+				DrawBitmap(AutoBitmap("close.png"_s), x2 - 21, y1 + 5, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 			}
-			else //ï¿½ï¿½ï¿½Ç»î¶¯ï¿½Äµï¿½
+			else //²»ÊÇ»î¶¯ÎÄµµ
 			{
 				DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 				SetClippingRegion(x1 + 10, y1, x2 * 0.8, y2);
@@ -39,36 +50,49 @@ void DocTabUserArea::DrawMsg(Int32 x1, Int32 y1, Int32 x2, Int32 y2, const BaseC
 				DrawBitmap(AutoBitmap("close_in.png"_s), x2 - 21, y1 + 5, 13, 13, 0, 0, 160, 160, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 			}
 		}
+		break;
 	}
-	else if (mode == ADD_TAB) //ï¿½ï¿½ï¿½Ó°ï¿½Å¥
+	case ADD_TAB:
 	{
 		DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 		DrawSetTextCol(Vector(165, 165, 165) / 256, COLOR_TRANS);
-		DrawText("+"_s, x2 * 0.3, y2 * 0.65 - 8);	
-	}if (mode == REC_DOC) {
+		DrawText("+"_s, x2 * 0.3, y2 * 0.65 - 8);
+		break;
+	}
+	case REC_DOC:
+	{
 		DrawBitmap(AutoBitmap("inactive.png"_s), x1, y1, x2, y2, 0, 0, 456, 185, BMP_NORMALSCALED | BMP_ALLOWALPHA);
 		DrawSetTextCol(Vector(165, 165, 165) / 256, COLOR_TRANS);
 		DrawText("R"_s, x2 * 0.3, y2 * 0.65 - 8);
+		break;
+	}
+	default:
+		break;
 	}
 }
 Bool DocTabUserArea::InputEvent(const BaseContainer& msg) {
 	if (msg.GetInt32(BFM_INPUT_DEVICE) == BFM_INPUT_MOUSE && msg.GetInt32(BFM_INPUT_CHANNEL) == BFM_INPUT_MOUSELEFT)
 	{
-		
-		if (mode == DOC_TAB) {
+		switch (mode)
+		{
+		case DOC_TAB:
+		{
 			Int32 ClickX = msg.GetInt32(BFM_INPUT_X);
 			Int32 ClickY = msg.GetInt32(BFM_INPUT_Y);
-			Global2Local(&ClickX, &ClickY);	
-			SetActiveDocument(doc);	
+			Global2Local(&ClickX, &ClickY);
+			SetActiveDocument(doc);
 			if (ClickX >= (Int32)(this->GetWidth() - 21) && ClickX <= (Int32)(this->GetWidth() - 8) && ClickY >= 5 && ClickY <= 18) {
-				//ï¿½Ð¶Ïµï¿½ï¿½ï¿½ï¿½ï¿½Ú¡ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+				//ÅÐ¶Ïµã»÷ÊÇÔÚ¡ÁµÄÎ»ÖÃ
 				if (doc != nullptr) {
-					if (msg.GetInt32(BFM_INPUT_QUALIFIER) == 1)//QUALIFIER::SHIFT = 1ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç·ï¿½Í¬Ê±ï¿½ï¿½shift
+					//QUALIFIER::SHIFT = 1£¬ÅÐ¶ÏÊÇ·ñÍ¬Ê±°´shift
+					if (msg.GetInt32(BFM_INPUT_QUALIFIER) == 1)
 					{
+						//Ö±½Ó¹Ø±ÕÎÄµµ
 						KillDocument(doc);
 					}
 					else {
-						if (IsCommandEnabled(12664))//callï¿½Ø±ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+						//call¹Ø±ÕÏîÄ¿µÄÃüÁî
+						if (IsCommandEnabled(12664))
 						{
 							CallCommand(12664);
 						}
@@ -76,43 +100,117 @@ Bool DocTabUserArea::InputEvent(const BaseContainer& msg) {
 					if (!((DocTabDialog*)dlg)->RefreshTab())return false;
 				}
 			}
+			break;
 		}
-		else if (mode == ADD_TAB) {
-			if (IsCommandEnabled(12094)) //callï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		case ADD_TAB:
+		{
+			//call´ò¿ªÏîÄ¿µÄÃüÁî
+			if (IsCommandEnabled(12094))
 			{
 				CallCommand(12094);
 			}
 			if (!((DocTabDialog*)dlg)->RefreshTab())return false;
+			break;
 		}
-		else  if (mode == REC_DOC) {
+		case REC_DOC:
+		{
 			maxon::BaseArray<maxon::Url> RecDocArr = GetRecentDocumentsList(false).GetValue();
 			BaseContainer bc;
-			Int32 index = 1;//ï¿½ï¿½1ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½0ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½Öµï¿½ï¿½-1
-			for (maxon::Url i : RecDocArr) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			//´Ó1¿ªÊ¼£¬·ÀÖ¹Óë0³åÍ»£¬×îºóµÄ·µ»ØÖµÐèÒª-1
+			Int32 index = 1;
+			//µü´ú×î½üÎÄµµ£¬²¢ÉèÖÃË÷Òý
+			for (maxon::Url i : RecDocArr)
 			{
-				bc.SetString(index, i.GetPath());			
+				bc.SetString(index, i.GetPath());
 				index++;
 			}
 			Int32 openDoc = ShowPopupMenu(nullptr, MOUSEPOS, MOUSEPOS, bc);
-			if (openDoc!=0) //ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ñ¡ï¿½ï¿½
+			//·µ»Ø0¾ÍÊÇÃ»ÓÐÑ¡Ôñ
+			if (openDoc != 0)
 			{
 				if (!LoadFile(MaxonConvert(RecDocArr[openDoc - 1]))) {
 					MessageDialog(GeLoadString(MSG_LOADFILE_FAIL));
 				}
 				if (!((DocTabDialog*)dlg)->RefreshTab())return false;
 			}
+			break;
+		}
+		default:
+			break;
 		}
 	}
 	return true;
 }
 
 Bool DocTabDialog::CreateLayout() {
+	//Ê×ÏÈµ÷ÓÃ¸¸ÀàµÄ´´½¨²¼¾Ö
+	Bool res = GeDialog::CreateLayout();
+	//ÉèÖÃ±êÌâ
 	this->SetTitle("DocTab"_s);
 	BaseDocument* doc = GetFirstDocument();
-	GroupBeginInMenuLine();
 	GroupBegin(1000, BFH_LEFT , 0, 1, ""_s, 0, 0, 0);
 	GroupSpace(0, 0);
-	while (doc != nullptr)//ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½Ç©
+	//Ìí¼Ó¹Ì¶¨Pin×é¼þ
+	C4DOS.Cd->AddGadget(Get(), DIALOG_PIN, 999, NULL, BFH_LEFT | BFV_TOP, 0, 0, 0, NULL, NULL);
+	//±éÀúÈ«²¿µÄÏîÄ¿£¬Ìí¼Óµ½±êÇ©
+	while (doc != nullptr)
+	{
+		Int32 Index = doc_tab_dialog_arr.GetCount();
+		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
+		Int32 TabW = 40;
+		String& DocName = doc->GetDocumentName().GetFileString();
+		//¼ÆËãÎÄµµÃû³Æ³¤¶È
+		for (Char i : DocName)
+		{
+			if (maxon::IsAlphanumeric(i) || maxon::IsSpace(i)) {
+				TabW += 12;
+			}
+			else {
+				TabW += 15;
+			}
+		}
+		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT, TabW, 14);
+		if (userAreaGadget != nullptr)
+			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
+		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
+		doc = doc->GetNext();
+	}
+	addDocTab = new DocTabUserArea(nullptr, ADD_TAB);
+	//Ìí¼ÓÌí¼Ó±êÇ©µÄ°´Å¥
+	C4DGadget* userAreaGadget = this->AddUserArea(1001, BFH_LEFT, 30, 14);
+	if (userAreaGadget != nullptr)
+		this->AttachUserArea((*addDocTab), userAreaGadget);
+	recDocTab = new DocTabUserArea(nullptr, REC_DOC);
+	//Ìí¼ÓÀúÊ·ÎÄµµµÄ°´Å¥
+	userAreaGadget = this->AddUserArea(1002, BFH_LEFT, 30, 14);
+	if (userAreaGadget != nullptr)
+		this->AttachUserArea((*recDocTab), userAreaGadget);
+	GroupEnd();
+	return true;
+}
+Bool DocTabDialog::CoreMessage(Int32 id, const BaseContainer& msg) {
+	if (id == EVMSG_DOCUMENTRECALCULATED) {
+		if (!this->RefreshTab())return false;
+	}
+	return SUPER::CoreMessage(id, msg);
+}
+
+Bool DocTabDialog::RefreshTab() {
+	//ÊÍ·ÅÖ®Ç°µÄ±êÇ©
+	for (DocTabUserArea* i : doc_tab_dialog_arr)
+	{
+		if (i) {
+			delete i;
+		}
+	}
+	doc_tab_dialog_arr.Reset();
+	BaseDocument* doc = GetFirstDocument();
+	//Ë¢ÐÂ×é
+	LayoutFlushGroup(1000);
+	//Ìí¼Ó¹Ì¶¨Pin×é¼þ
+	C4DOS.Cd->AddGadget(Get(), DIALOG_PIN, 999, NULL, BFH_LEFT | BFV_TOP, 0, 0, 0, NULL, NULL);
+	//±éÀúÈ«²¿µÄÏîÄ¿£¬Ìí¼Óµ½±êÇ©
+	while (doc != nullptr)
 	{
 		Int32 Index = doc_tab_dialog_arr.GetCount();
 		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
@@ -132,59 +230,12 @@ Bool DocTabDialog::CreateLayout() {
 		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
 		doc = doc->GetNext();
 	}
-	addDocTab = new DocTabUserArea(nullptr, ADD_TAB);
-	C4DGadget* userAreaGadget = this->AddUserArea(1001, BFH_LEFT, 30, 14);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó±ï¿½Ç©ï¿½Ä°ï¿½Å¥
+	//Ìí¼ÓÌí¼Ó±êÇ©µÄ°´Å¥
+	C4DGadget* userAreaGadget = this->AddUserArea(1001, BFH_LEFT, 30, 14);
 	if (userAreaGadget != nullptr)
 		this->AttachUserArea((*addDocTab), userAreaGadget);
-	recDocTab = new DocTabUserArea(nullptr, REC_DOC);
-	userAreaGadget = this->AddUserArea(1002, BFH_LEFT, 30, 14);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê·ï¿½Äµï¿½ï¿½Ä°ï¿½Å¥
-	if (userAreaGadget != nullptr)
-		this->AttachUserArea((*recDocTab), userAreaGadget);
-	GroupEnd();
-	GroupEnd();
-	return true;
-}
-Bool DocTabDialog::CoreMessage(Int32 id, const BaseContainer& msg) {
-	if (id == EVMSG_DOCUMENTRECALCULATED) {
-		if (!this->RefreshTab())return false;
-	}
-	return SUPER::CoreMessage(id, msg);
-}
-
-Bool DocTabDialog::RefreshTab() {
-	for (DocTabUserArea* i : doc_tab_dialog_arr) //ï¿½Í·ï¿½Ö®Ç°ï¿½Ä±ï¿½Ç©
-	{
-		if (i) {
-			delete i;
-		}
-	}
-	doc_tab_dialog_arr.Reset();
-	BaseDocument* doc = GetFirstDocument();
-	LayoutFlushGroup(1000);//Ë¢ï¿½ï¿½ï¿½ï¿½
-	while (doc != nullptr)//ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½Ç©
-	{
-		Int32 Index = doc_tab_dialog_arr.GetCount();
-		DocTabUserArea* doc_tab_user_area = new DocTabUserArea(doc, DOC_TAB);
-		Int32 TabW = 40;
-		String& DocName = doc->GetDocumentName().GetFileString();
-		for (Char i : DocName) {
-			if (maxon::IsAlphanumeric(i) || maxon::IsSpace(i)) {
-				TabW += 12;
-			}
-			else {
-				TabW += 15;
-			}
-		}
-		C4DGadget* const userAreaGadget = this->AddUserArea(10000 + Index, BFH_LEFT , TabW, 14);
-		if (userAreaGadget != nullptr)
-			this->AttachUserArea((*doc_tab_user_area), userAreaGadget);
-		iferr(doc_tab_dialog_arr.Append(doc_tab_user_area))return false;
-		doc = doc->GetNext();
-	}
-	C4DGadget* userAreaGadget = this->AddUserArea(1001, BFH_LEFT , 30, 14);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó±ï¿½Ç©ï¿½Ä°ï¿½Å¥
-	if (userAreaGadget != nullptr)
-		this->AttachUserArea((*addDocTab), userAreaGadget);
-	userAreaGadget = this->AddUserArea(1002, BFH_LEFT, 30, 14);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê·ï¿½Äµï¿½ï¿½Ä°ï¿½Å¥
+	//Ìí¼ÓÀúÊ·ÎÄµµµÄ°´Å¥
+	userAreaGadget = this->AddUserArea(1002, BFH_LEFT, 30, 14);
 	if (userAreaGadget != nullptr)
 		this->AttachUserArea((*recDocTab), userAreaGadget);
 	LayoutChanged(1000);
