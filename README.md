@@ -6,6 +6,10 @@
 
 Document tag plugin for C4D R20 and above. (R20-S24)
 
+## Download
+
+https://github.com/AiMiDi/C4D_DocTab/releases/download/v1.5/DocTab_v1.5.zip
+
 ## usage
 
 Click `+` to create a new project, click `R` to open the historical project; 
@@ -49,6 +53,10 @@ https://github.com/AiMiDi/C4D_DocTab
 ## 简介
 
 C4D R20以上版本用的文档标签插件。(R20-S24)
+
+## 下载
+
+https://github.com/AiMiDi/C4D_DocTab/releases/download/v1.5/DocTab_v1.5.zip
 
 ## 使用
 
